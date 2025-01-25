@@ -22,18 +22,32 @@ with three double parameters: `kp`, `ki`, and `kd`.
 
 Here is an example of how you might use the PIDF Controller in an OpMode:
 ```kotlin
-class MyOpMode : OpMode {
-    private val motor by lazy { hardwareMap.get(DcMotorEx::class.java, "motor") } }
-    private val pidfController by lazy { PIDFController(PIDCoefficients(1.0, 0.0, 0.0)) } 
-    //the coefficients are just placeholders, you should tune them to your motor
+package org.firstinspires.ftc.teamcode
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.DcMotorEx
+
+@TeleOp
+class MyOpMode : OpMode() {
+    private val motor by lazy { hardwareMap.get(DcMotorEx::class.java, "motor") }
+
+    // These coefficients are just placeholders, you should tune them to your motor
+    private val pidfController by lazy { PIDFController(
+        PIDFController.PIDCoefficients(
+            1.0,
+            0.0,
+            0.0
+        )
+    ) }
 
     override fun init() {
         pidfController.targetPosition = 1000 //set the target position to 1000
     }
 
     override fun loop() {
-        motor.power = pidfController.update(motor.currentPosition)
-        //update the motor power based on the current position *every loop*
+        // Update the motor power based on the current position *every loop*
+        motor.power = pidfController.update(motor.currentPosition.toDouble())
     }
 }
 ```
@@ -53,19 +67,36 @@ When creating a PIDFController object, you can specify all of those, just `kV`, 
 
 Here is an example of how you might use the PIDF Controller with feedforward in an OpMode:
 ```kotlin
-class MyOpMode : OpMode {
-    private val motor by lazy { hardwareMap.get(DcMotorEx::class.java, "motor") } }
-    private val pidfController by lazy { PIDFController(PIDCoefficients(1.0, 0.0, 0.0), 0.1, 0.1, 0.1) } 
-    //the coefficients are just placeholders, you should tune them to your motor
+package org.firstinspires.ftc.teamcode
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.DcMotorEx
+
+@TeleOp
+class MyOpMode : OpMode() {
+    private val motor by lazy { hardwareMap.get(DcMotorEx::class.java, "motor") }
+
+    // These coefficients are just placeholders, you should tune them to your motor
+    private val pidfController by lazy { PIDFController(
+        PIDFController.PIDCoefficients(
+            1.0,
+            0.0,
+            0.0
+        ),
+        0.1,
+        0.1,
+        0.1
+    ) }
 
     override fun init() {
         pidfController.targetPosition = 1000 //set the target position to 1000
     }
 
     override fun loop() {
-        motor.power = pidfController.update(System.nanoTime(), motor.currentPosition, motor.velocity)
-        //when specifing velocity, you must also specify the time in nanoseconds
-        //update the motor power based on the current position and velocity *every loop*
+        // Update the motor power based on the current position and velocity *every loop*
+        // When specifing velocity, you must also specify the time in nanoseconds
+        motor.power = pidfController.update(System.nanoTime(), motor.currentPosition.toDouble(), motor.velocity)
     }
 }
 ```
